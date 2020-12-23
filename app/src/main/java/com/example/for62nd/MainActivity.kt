@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
         setContentView(R.layout.activity_main)
         floatingActionButton_main.setOnClickListener(this)
         initActivity()
-        Log.i("INFORMATION","onCreate")
     }
 
     private fun initActivity(){
@@ -34,12 +33,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
         }
         recyclerView_main.adapter = RecyclerAdapter(this,this,data)
         recyclerView_main.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        Log.i("INFORMATION","initActivity")
-        Log.i("INFORMATION-8",data.count().toString())
     }
 
     private fun insertData(id: Int, title: String, detail: String) {
-        Log.i("INFORMATION","insertData")
         try{
             val dbHelper = MemoDatabaseOpenHelper(applicationContext,dbName,null,dbVersion)
             val database = dbHelper.writableDatabase
@@ -49,20 +45,15 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
             values.put("title",title)
             values.put("detail",detail)
             database.insertOrThrow(tableName,null,values)
-            Log.i("INFORMATION-4",id.toString())
-            Log.i("INFORMATION-5",title)
-            Log.i("INFORMATION-6",detail)
         }catch (exception: Exception) {
             Log.e("insertData",exception.toString())
         }
     }
 
     private fun updateData(whereId: Int, newTitle: String, newDetail: String) {
-        Log.i("INFORMATION","updateData")
         try{
             val dbHelper = MemoDatabaseOpenHelper(applicationContext,dbName,null,dbVersion)
             val database = dbHelper.writableDatabase
-
             val values = ContentValues()
             values.put("title",newTitle)
             values.put("detail",newDetail)
@@ -70,9 +61,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
             val whereClauses = "id = ?"
             val whereArgs = arrayOf(whereId.toString())
             database.update(tableName, values, whereClauses, whereArgs)
-            Log.i("INFORMATION-1",whereId.toString())
-            Log.i("INFORMATION-2",newTitle)
-            Log.i("INFORMATION-3",newDetail)
         }catch(exception: Exception) {
             Log.e("updateData", exception.toString())
         }
@@ -118,7 +106,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
     }
 
     private fun selectAll() {
-        Log.i("INFORMATION","selectAll")
         try{
             arrayListTitle.clear()
             arrayListDetail.clear()
@@ -126,7 +113,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
             val databaseOpenHelper = MemoDatabaseOpenHelper(applicationContext,dbName,null,dbVersion)
             val database = databaseOpenHelper.readableDatabase
 
-            val sql = "select id, title, detail from " + tableName
+            val sql = "select id, title, detail from $tableName"
 
             val cursor = database.rawQuery(sql,null)
             if(cursor.count > 0) {
@@ -138,20 +125,18 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
                     cursor.moveToNext()
                 }
             }
-            Log.i("INFORMATION-7",arrayListId.count().toString())
         }catch(exception: Exception) {
             Log.e("selectAll", exception.toString())
         }
     }
 
     private fun getLastId(): Int? {
-        Log.i("INFORMATION","getLastId")
         try{
             arrayListId.clear()
             val databaseOpenHelper = MemoDatabaseOpenHelper(applicationContext,dbName,null,dbVersion)
             val database = databaseOpenHelper.readableDatabase
 
-            val sql = "select id from " + tableName
+            val sql = "select id from $tableName"
             val cursor = database.rawQuery(sql,null)
             if(cursor.count > 0) {
                 cursor.moveToFirst()
@@ -172,7 +157,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
     }
 
     override fun onItemClick(view: View, position: Int) {
-        Log.i("INFORMATION","onItemClick")
         //ホントは安全でないキャストはしないほうがいい
         //各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
         val id_of_view = view.id_container.getTag() as Int
@@ -186,12 +170,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
     }
 
     override fun onRemoved(id: Int?, title: String?, detail: String?,isNew: Boolean?) {
-        Log.i("INFORMATION","onRemoved")
         if(isNew!!){
-            val str: String = id!!.toString()+","+title!!.toString()+","+detail!!.toString()
-            Log.i("INFORMATION-9",str)
-            Log.i("INFORMATION-10",title!!.toString())
-            Log.i("INFORMATION-11",detail!!.toString())
             //isNewがtrue,つまり新規作成の場合
             insertData(id!!,title!!,detail!!)
             initActivity()
@@ -203,13 +182,11 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
     }
 
     override fun onClick(v: View?) {
-        Log.i("INFORMATION","onClick")
         //新規ボタンが押された処理。新規の編集画面へ移行
         val newID = getLastId()!! + 1
         val edit_fragment = EditFragment.newInstance(newID,"","",true)
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(R.id.fragment_container,edit_fragment)
         fragmentTransaction.commit()
-        Log.i("INFORMATION",newID.toString())
     }
 }

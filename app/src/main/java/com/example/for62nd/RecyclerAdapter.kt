@@ -20,7 +20,7 @@ class RecyclerAdapter(private val context: Context, private val itemClickListene
     }
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        holder?.let {
+        holder.let {
             it.idContainer.setTag(itemList[position].id)
             it.titleTextView.text = itemList[position].title
             it.detailTextView.text = itemList[position].detail

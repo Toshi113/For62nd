@@ -16,6 +16,10 @@ private const val KEY_TITLE = "TITLE"
 private const val KEY_DETAIL = "DETAIL"
 private const val KEY_ISNEW = "ISNEW"
 
+private var m_editText_title: EditText? = null
+private var m_editText_detail: EditText? = null
+private var m_button_save: Button? = null
+
 class EditFragment : Fragment() ,View.OnClickListener{
 
     private var Id: Int? = null
@@ -44,12 +48,12 @@ class EditFragment : Fragment() ,View.OnClickListener{
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         var view: View = inflater.inflate(R.layout.fragment_edit, container, false)
-        var editText_title:EditText = view.findViewById(R.id.editText_tite)
-        var editText_detail:EditText = view.findViewById(R.id.editText_detail)
-        var button_save: Button = view.findViewById(R.id.button_save)
-        button_save.setOnClickListener(this)
-        editText_title.setText(Title)
-        editText_detail.setText(Detail)
+        m_editText_title = view.findViewById(R.id.editText_tite)
+        m_editText_detail  = view.findViewById(R.id.editText_detail)
+        m_button_save = view.findViewById(R.id.button_save)
+        m_button_save!!.setOnClickListener(this)
+        m_editText_title!!.setText(Title)
+        m_editText_detail!!.setText(Detail)
         return view
     }
 
@@ -75,7 +79,7 @@ class EditFragment : Fragment() ,View.OnClickListener{
         Log.i("INFORMATION","onDestroy")
         super.onDestroy()
         //TODO あとはここのtextをうまく取得するだけ!!
-        listener?.onRemoved(Id, editText_tite.text.toString(), editText_detail.text.toString(),IsNew)
+        listener?.onRemoved(Id, m_editText_title!!.text.toString(), m_editText_detail!!.text.toString(),IsNew)
     }
 
     override fun onAttach(context: Context) {
