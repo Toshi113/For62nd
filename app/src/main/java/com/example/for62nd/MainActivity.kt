@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
         recyclerView_main.adapter = RecyclerAdapter(this,this,data)
         recyclerView_main.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         Log.i("INFORMATION","initActivity")
-        Log.i("INFORMATION",data.count().toString())
+        Log.i("INFORMATION-8",data.count().toString())
     }
 
     private fun insertData(id: Int, title: String, detail: String) {
@@ -49,9 +49,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
             values.put("title",title)
             values.put("detail",detail)
             database.insertOrThrow(tableName,null,values)
-            Log.i("INFORMATION",id.toString())
-            Log.i("INFORMATION",title)
-            Log.i("INFORMATION",detail)
+            Log.i("INFORMATION-4",id.toString())
+            Log.i("INFORMATION-5",title)
+            Log.i("INFORMATION-6",detail)
         }catch (exception: Exception) {
             Log.e("insertData",exception.toString())
         }
@@ -70,9 +70,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
             val whereClauses = "id = ?"
             val whereArgs = arrayOf(whereId.toString())
             database.update(tableName, values, whereClauses, whereArgs)
-            Log.i("INFORMATION",whereId.toString())
-            Log.i("INFORMATION",newTitle)
-            Log.i("INFORMATION",newDetail)
+            Log.i("INFORMATION-1",whereId.toString())
+            Log.i("INFORMATION-2",newTitle)
+            Log.i("INFORMATION-3",newDetail)
         }catch(exception: Exception) {
             Log.e("updateData", exception.toString())
         }
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
                     cursor.moveToNext()
                 }
             }
-            Log.i("INFORMATION",arrayListId.count().toString())
+            Log.i("INFORMATION-7",arrayListId.count().toString())
         }catch(exception: Exception) {
             Log.e("selectAll", exception.toString())
         }
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
         Log.i("INFORMATION","onItemClick")
         //ホントは安全でないキャストはしないほうがいい
         //各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
-        val id_of_view = view.id_container.getTag(1) as Int
+        val id_of_view = view.id_container.getTag() as Int
         val title_of_view = view.title_textView.text.toString()
         val detail_of_view = view.detail_textView.text.toString()
 
@@ -188,9 +188,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, 
     override fun onRemoved(id: Int?, title: String?, detail: String?,isNew: Boolean?) {
         Log.i("INFORMATION","onRemoved")
         if(isNew!!){
-            Log.i("INFORMATION",id!!.toString())
-            Log.i("INFORMATION",title!!)
-            Log.i("INFORMATION",detail!!)
+            val str: String = id!!.toString()+","+title!!.toString()+","+detail!!.toString()
+            Log.i("INFORMATION-9",str)
+            Log.i("INFORMATION-10",title!!.toString())
+            Log.i("INFORMATION-11",detail!!.toString())
             //isNewがtrue,つまり新規作成の場合
             insertData(id!!,title!!,detail!!)
             initActivity()

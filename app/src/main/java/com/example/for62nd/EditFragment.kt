@@ -1,18 +1,20 @@
 package com.example.for62nd
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import kotlinx.android.synthetic.main.fragment_edit.*
 
 private const val KEY_ID = "ID"
 private const val KEY_TITLE = "TITLE"
 private const val KEY_DETAIL = "DETAIL"
 private const val KEY_ISNEW = "ISNEW"
-
 
 class EditFragment : Fragment() ,View.OnClickListener{
 
@@ -70,7 +72,14 @@ class EditFragment : Fragment() ,View.OnClickListener{
     }
 
     override fun onDestroy() {
-        listener?.onRemoved(Id, Title, Detail,IsNew)
+        Log.i("INFORMATION","onDestroy")
         super.onDestroy()
+        //TODO あとはここのtextをうまく取得するだけ!!
+        listener?.onRemoved(Id, editText_tite.text.toString(), editText_detail.text.toString(),IsNew)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as MainActivity
     }
 }
