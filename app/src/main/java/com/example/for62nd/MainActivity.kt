@@ -6,12 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.list_item.view.*
 import java.lang.Exception
-//TODO 新規作成実装
-class MainActivity : AppCompatActivity() , RecyclerViewHolder.ItemClickListener{
+
+class MainActivity : AppCompatActivity(), RecyclerViewHolder.ItemClickListener, EditFragment.FragmentListener, View.OnClickListener{
     private val dbName: String = "MemoDB"
     private val tableName: String = "MemoTable"
     private val dbVersion: Int = 1
@@ -22,6 +21,8 @@ class MainActivity : AppCompatActivity() , RecyclerViewHolder.ItemClickListener{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        floatingActionButton_main.setOnClickListener(this)
     }
 
     private fun initActivity(){
@@ -130,14 +131,59 @@ class MainActivity : AppCompatActivity() , RecyclerViewHolder.ItemClickListener{
         }
     }
 
+    private fun getLastId(): Int? {
+        try{
+            arrayListId.clear()
+            val databaseOpenHelper = MemoDatabaseOpenHelper(applicationContext,dbName,null,dbVersion)
+            val database = databaseOpenHelper.readableDatabase
+
+            val sql = "select id from " + tableName
+            val cursor = database.rawQuery(sql,null)
+            if(cursor.count > 0) {
+                cursor.moveToFirst()
+                while(!cursor.isAfterLast) {
+                    arrayListId.add(cursor.getInt(0))
+                    cursor.moveToNext()
+                }
+            }
+            return if(arrayListId.count() == 0) {
+                0
+            }else {
+                arrayListId.max()
+            }
+        }catch (exception: Exception) {
+            Log.e("getLastId", exception.toString())
+            throw exception
+        }
+    }
+
     override fun onItemClick(view: View, position: Int) {
         //ホントは安全でないキャストはしないほうがいい
+        //各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
         val id_of_view = view.id_container.getTag(1) as Int
-        selectData(id_of_view)
-        val title_of_view = arrayListTitle[0]
-        val detail_of_view = arrayListDetail[0]
+        val title_of_view = view.title_textView.text.toString()
+        val detail_of_view = view.detail_textView.text.toString()
 
-        val edit_fragment = EditFragment.newInstance(title_of_view,detail_of_view)
+        val edit_fragment = EditFragment.newInstance(id_of_view,title_of_view,detail_of_view,false)
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.add(R.id.fragment_container,edit_fragment)
+        fragmentTransaction.commit()
+    }
+
+    override fun onRemoved(id: Int?, title: String?, detail: String?,isNew: Boolean?) {
+        if(isNew!!){
+            //isNewがtrue,つまり新規作成の場合
+            insertData(id!!,title!!,detail!!)
+        }else{
+            //isNewがfalse,つまり編集の場合
+            updateData(id!!,title!!,detail!!)
+        }
+    }
+
+    override fun onClick(v: View?) {
+        //新規ボタンが押された処理。新規の編集画面へ移行
+        val newID = getLastId()!! + 1
+        val edit_fragment = EditFragment.newInstance(newID,"","",true)
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(R.id.fragment_container,edit_fragment)
         fragmentTransaction.commit()

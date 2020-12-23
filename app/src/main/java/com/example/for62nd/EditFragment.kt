@@ -8,26 +8,33 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val KEY_ID = "ID"
 private const val KEY_TITLE = "TITLE"
 private const val KEY_DETAIL = "DETAIL"
+private const val KEY_ISNEW = "ISNEW"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [EditFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class EditFragment : Fragment() ,View.OnClickListener{
-    // TODO: Rename and change types of parameters
+
+    private var Id: Int? = null
     private var Title: String? = null
     private var Detail: String? = null
+    //新規の場合はtrue,編集の場合はfalse
+    private var IsNew: Boolean? = null
+
+    private var listener: FragmentListener? = null
+
+    interface FragmentListener {
+        fun onRemoved(id: Int?, title: String?, detail: String?, isNew: Boolean?)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
+            Id = it.getInt(KEY_ID)
             Title = it.getString(KEY_TITLE)
             Detail = it.getString(KEY_DETAIL)
+            IsNew = it.getBoolean(KEY_ISNEW)
         }
     }
 
@@ -46,16 +53,24 @@ class EditFragment : Fragment() ,View.OnClickListener{
 
     companion object {
         @JvmStatic
-        fun newInstance(title: String, detail: String) =
+        fun newInstance(id: Int,title: String, detail: String, is_new: Boolean) =
             EditFragment().apply {
                 arguments = Bundle().apply {
+                    putInt(KEY_ID, id)
                     putString(KEY_TITLE, title)
                     putString(KEY_DETAIL, detail)
+                    putBoolean(KEY_ISNEW,is_new)
                 }
             }
     }
 
     override fun onClick(v: View?) {
         //TODO ここにFragment終了処理andデータベースに保存(MainActivityの方に値を返す)
+        fragmentManager!!.beginTransaction().remove(this).commit()
+    }
+
+    override fun onDestroy() {
+        listener?.onRemoved(Id, Title, Detail,IsNew)
+        super.onDestroy()
     }
 }
