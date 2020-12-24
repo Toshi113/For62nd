@@ -1,5 +1,6 @@
 package com.example.for62nd
 
+import android.content.ContentValues
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -10,17 +11,24 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import kotlinx.android.synthetic.main.fragment_edit.*
+import java.lang.Exception
 
 private const val KEY_ID = "ID"
 private const val KEY_TITLE = "TITLE"
 private const val KEY_DETAIL = "DETAIL"
 private const val KEY_ISNEW = "ISNEW"
 
-private var m_editText_title: EditText? = null
-private var m_editText_detail: EditText? = null
-private var m_button_save: Button? = null
+
 
 class EditFragment : Fragment() ,View.OnClickListener{
+
+    private var m_editText_title: EditText? = null
+    private var m_editText_detail: EditText? = null
+    private var m_button_save: Button? = null
+
+    private val dbName: String = "MemoDB"
+    private val tableName: String = "MemoTable"
+    private val dbVersion: Int = 1
 
     private var Id: Int? = null
     private var Title: String? = null
@@ -28,11 +36,12 @@ class EditFragment : Fragment() ,View.OnClickListener{
     //新規の場合はtrue,編集の場合はfalse
     private var IsNew: Boolean? = null
 
-    private var listener: FragmentListener? = null
-
-    interface FragmentListener {
-        fun onRemoved(id: Int?, title: String?, detail: String?, isNew: Boolean?)
-    }
+    /*
+private var listener: FragmentListener? = null
+interface FragmentListener {
+    fun onRemoved(id: Int?, title: String?, detail: String?, isNew: Boolean?)
+}
+ */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +56,7 @@ class EditFragment : Fragment() ,View.OnClickListener{
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        var view: View = inflater.inflate(R.layout.fragment_edit, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_edit, container, false)
         m_editText_title = view.findViewById(R.id.editText_tite)
         m_editText_detail  = view.findViewById(R.id.editText_detail)
         m_button_save = view.findViewById(R.id.button_save)
@@ -71,19 +80,55 @@ class EditFragment : Fragment() ,View.OnClickListener{
     }
 
     override fun onClick(v: View?) {
-        //TODO ここにFragment終了処理andデータベースに保存(MainActivityの方に値を返す)
-        fragmentManager!!.beginTransaction().remove(this).commit()
+        if(IsNew!!) {
+            //isNewがtrue,つまり新規作成の場合
+            insertData(Id!!,m_editText_title!!.text.toString(),m_editText_detail!!.text.toString())
+        }else{
+            //isNewがfalse,つまり編集の場合
+            updateData(Id!!,m_editText_title!!.text.toString(),m_editText_detail!!.text.toString())
+        }
+        fragmentManager!!.beginTransaction().commit()
     }
 
     override fun onDestroy() {
         Log.i("INFORMATION","onDestroy")
         super.onDestroy()
-        //TODO あとはここのtextをうまく取得するだけ!!
-        listener?.onRemoved(Id, m_editText_title!!.text.toString(), m_editText_detail!!.text.toString(),IsNew)
+        //listener?.onRemoved(Id, m_editText_title!!.text.toString(), m_editText_detail!!.text.toString(),IsNew)
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        listener = context as MainActivity
+        //listener = context as MainFragment
+    }
+
+    private fun updateData(whereId: Int, newTitle: String, newDetail: String) {
+        try{
+            val dbHelper = MemoDatabaseOpenHelper(activity!!.applicationContext,dbName,null,dbVersion)
+            val database = dbHelper.writableDatabase
+            val values = ContentValues()
+            values.put("title",newTitle)
+            values.put("detail",newDetail)
+
+            val whereClauses = "id = ?"
+            val whereArgs = arrayOf(whereId.toString())
+            database.update(tableName, values, whereClauses, whereArgs)
+        }catch(exception: Exception) {
+            Log.e("updateData", exception.toString())
+        }
+    }
+
+    private fun insertData(id: Int, title: String, detail: String) {
+        try{
+            val dbHelper = MemoDatabaseOpenHelper(activity!!.applicationContext,dbName,null,dbVersion)
+            val database = dbHelper.writableDatabase
+
+            val values = ContentValues()
+            values.put("id",id)
+            values.put("title",title)
+            values.put("detail",detail)
+            database.insertOrThrow(tableName,null,values)
+        }catch (exception: Exception) {
+            Log.e("insertData",exception.toString())
+        }
     }
 }
