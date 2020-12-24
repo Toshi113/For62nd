@@ -8,11 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Space
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.fragment_main.*
-import kotlinx.android.synthetic.main.list_item.view.*
 import java.lang.Exception
 
 
@@ -39,6 +39,7 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         val m_floatingActionButton_main: FloatingActionButton = view.findViewById(R.id.floatingActionButton_main)
         m_recyclerView_main = view.findViewById(R.id.recyclerView_main)
         m_floatingActionButton_main.setOnClickListener(this)
+        initRecyclerView()
         return view
     }
 
@@ -136,9 +137,9 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
 
     override fun onItemClick(view: View, position: Int) {
         //各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
-        val id_of_view = view.id_container.getTag() as Int
-        val title_of_view = view.title_textView.text.toString()
-        val detail_of_view = view.detail_textView.text.toString()
+        val id_of_view = view.findViewById<Space>(R.id.id_container).getTag() as Int
+        val title_of_view = view.findViewById<TextView>(R.id.title_textView).text.toString()
+        val detail_of_view = view.findViewById<TextView>(R.id.detail_textView).text.toString()
 
         val edit_fragment = EditFragment.newInstance(id_of_view,title_of_view,detail_of_view,false)
         val fragmentTransaction = fragmentManager!!.beginTransaction()
@@ -146,18 +147,6 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         fragmentTransaction?.replace(R.id.fragment_container, edit_fragment)
         fragmentTransaction.commit()
     }
-
-    /*override fun onRemoved(id: Int?, title: String?, detail: String?,isNew: Boolean?) {
-        if(isNew!!){
-            //isNewがtrue,つまり新規作成の場合
-            insertData(id!!,title!!,detail!!)
-            initRecyclerView()
-        }else{
-            //isNewがfalse,つまり編集の場合
-            updateData(id!!,title!!,detail!!)
-            initRecyclerView()
-        }
-    }*/
 
     override fun onClick(v: View?) {
         //新規ボタンが押された処理。新規の編集画面へ移行

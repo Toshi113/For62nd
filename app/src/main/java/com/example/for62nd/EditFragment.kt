@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import kotlinx.android.synthetic.main.fragment_edit.*
 import java.lang.Exception
 
 private const val KEY_ID = "ID"
@@ -35,13 +34,6 @@ class EditFragment : Fragment() ,View.OnClickListener{
     private var Detail: String? = null
     //新規の場合はtrue,編集の場合はfalse
     private var IsNew: Boolean? = null
-
-    /*
-private var listener: FragmentListener? = null
-interface FragmentListener {
-    fun onRemoved(id: Int?, title: String?, detail: String?, isNew: Boolean?)
-}
- */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +79,7 @@ interface FragmentListener {
             //isNewがfalse,つまり編集の場合
             updateData(Id!!,m_editText_title!!.text.toString(),m_editText_detail!!.text.toString())
         }
+        fragmentManager!!.popBackStack()
         fragmentManager!!.beginTransaction().commit()
     }
 
