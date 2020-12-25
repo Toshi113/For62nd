@@ -86,12 +86,6 @@ class EditFragment : Fragment() ,View.OnClickListener{
     override fun onDestroy() {
         Log.i("INFORMATION","onDestroy")
         super.onDestroy()
-        //listener?.onRemoved(Id, m_editText_title!!.text.toString(), m_editText_detail!!.text.toString(),IsNew)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        //listener = context as MainFragment
     }
 
     private fun updateData(whereId: Int, newTitle: String, newDetail: String) {

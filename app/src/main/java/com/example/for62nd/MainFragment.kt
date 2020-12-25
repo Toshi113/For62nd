@@ -1,13 +1,11 @@
 package com.example.for62nd
 
-import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Space
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -137,24 +135,24 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
 
     override fun onItemClick(view: View, position: Int) {
         //各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
-        val id_of_view = view.findViewById<Space>(R.id.id_container).getTag() as Int
-        val title_of_view = view.findViewById<TextView>(R.id.title_textView).text.toString()
-        val detail_of_view = view.findViewById<TextView>(R.id.detail_textView).text.toString()
+        val idOfView = view.findViewById<Space>(R.id.id_container).getTag() as Int
+        val titleOfView = view.findViewById<TextView>(R.id.title_textView).text.toString()
+        val detailOfView = view.findViewById<TextView>(R.id.detail_textView).text.toString()
 
-        val edit_fragment = EditFragment.newInstance(id_of_view,title_of_view,detail_of_view,false)
+        val editFragment = EditFragment.newInstance(idOfView,titleOfView,detailOfView,false)
         val fragmentTransaction = fragmentManager!!.beginTransaction()
         fragmentTransaction?.addToBackStack(null)
-        fragmentTransaction?.replace(R.id.fragment_container, edit_fragment)
+        fragmentTransaction?.replace(R.id.fragment_container, editFragment)
         fragmentTransaction.commit()
     }
 
     override fun onClick(v: View?) {
         //新規ボタンが押された処理。新規の編集画面へ移行
         val newID = getLastId()!! + 1
-        val edit_fragment = EditFragment.newInstance(newID,"","",true)
+        val editFragment = EditFragment.newInstance(newID,"","",true)
         val fragmentTransaction =fragmentManager!!.beginTransaction()
         fragmentTransaction?.addToBackStack(null)
-        fragmentTransaction?.replace(R.id.fragment_container, edit_fragment)
+        fragmentTransaction?.replace(R.id.fragment_container, editFragment)
         fragmentTransaction.commit()
     }
 
