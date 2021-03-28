@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
+// 普通にAdapter
 class RecyclerAdapter(private val context: Context, private val itemClickListener: RecyclerViewHolder.ItemClickListener, private val itemList:List<MemoStructure>) : RecyclerView.Adapter<RecyclerViewHolder>() {
 
     private var mRecyclerView : RecyclerView? = null
@@ -35,12 +36,13 @@ class RecyclerAdapter(private val context: Context, private val itemClickListene
         val layoutInflater = LayoutInflater.from(context)
         val mView = layoutInflater.inflate(R.layout.list_item, parent, false)
 
+        // ここでRecyclerViewの各項目にView.setOnClickListenerでonItemClickをクリックされたときに実行しろと指定している。
+        // ラムダ式が絡むから文法はよう知らん。
         mView.setOnClickListener { view ->
             mRecyclerView?.let {
                 itemClickListener.onItemClick(view, it.getChildAdapterPosition(view))
             }
         }
-
         return RecyclerViewHolder(mView)
     }
 }

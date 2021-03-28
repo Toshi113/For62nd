@@ -15,14 +15,15 @@ import java.lang.Exception
 
 
 class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnClickListener{
-
+    // データベース関連のデータ
     private val dbName: String = "MemoDB"
     private val tableName: String = "MemoTable"
     private val dbVersion: Int = 1
+    // データベースから複数のデータを取得した場合にいれとくところ。今考えたらMemoStructureのList1つで済む。けど僕は疲れててそれに気づかなかった()
     private var arrayListId: ArrayList<Int> = arrayListOf()
     private var arrayListTitle: ArrayList<String> = arrayListOf()
     private var arrayListDetail: ArrayList<String> = arrayListOf()
-
+    // リサイクラービュー用
     private var m_recyclerView_main: RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,11 +42,13 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         return view
     }
 
+    // このFragment特に引数ないからデフォルトのままでいい
     companion object {
         @JvmStatic
         fun newInstance() = MainFragment()
     }
 
+    // RecyclerViewをinitする。データベースからデータを取り直してリサイクラービューのアダプターに新しいデータ渡してる。
     private fun initRecyclerView(){
         selectAll()
         var data = mutableListOf<MemoStructure>()
@@ -56,6 +59,8 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         m_recyclerView_main?.layoutManager = LinearLayoutManager(activity!!.applicationContext, LinearLayoutManager.VERTICAL, false)
     }
 
+    // 以下データベース用
+    // 行の番号からデータ取得。結局使わなかったけどせっかくだからそのまま残してる
     private fun selectData(row: Int) {
         try{
             arrayListId.clear()
@@ -65,7 +70,8 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
             val databaseOpenHelper = MemoDatabaseOpenHelper(activity!!.applicationContext,dbName,null,dbVersion)
             val database = databaseOpenHelper.readableDatabase
 
-            val sql = "select id, title, detail from " + tableName + " where id = " + row.toString()
+            val sql = "select id, title, detail from $tableName where id = $row"
+            // val sql = "select id, title, detail from " + tableName + " where id = " + row.toString() と同じ
 
             val cursor = database.rawQuery(sql,null)
             if(cursor.count > 0) {
@@ -82,6 +88,7 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         }
     }
 
+    // 全データ取得
     private fun selectAll() {
         try{
             arrayListTitle.clear()
@@ -107,6 +114,7 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         }
     }
 
+    // 一番最後のidを取得。新規作成するときにEditFragmentに新しいメモのidを伝えなくちゃいけないから必要。一番でかいidに+1すれば絶対重複しない。
     private fun getLastId(): Int? {
         try{
             arrayListId.clear()
@@ -133,12 +141,15 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         }
     }
 
+    // 各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
     override fun onItemClick(view: View, position: Int) {
-        //各RecyclerViewのアイテムが押されたときの処理。編集画面に移行
+        // タグ使って各Itemのスペースにid保存してあるからそこからid取得できる
         val idOfView = view.findViewById<Space>(R.id.id_container).getTag() as Int
+        // タイトルとか内容は普通にtextViewのtextを取得しちゃえばいい
         val titleOfView = view.findViewById<TextView>(R.id.title_textView).text.toString()
         val detailOfView = view.findViewById<TextView>(R.id.detail_textView).text.toString()
 
+        // EditFragmentに移行
         val editFragment = EditFragment.newInstance(idOfView,titleOfView,detailOfView,false)
         val fragmentTransaction = fragmentManager!!.beginTransaction()
         fragmentTransaction?.addToBackStack(null)
@@ -146,10 +157,12 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
         fragmentTransaction.commit()
     }
 
+    // 新規ボタンが押された処理。新規の編集画面へ移行
     override fun onClick(v: View?) {
-        //新規ボタンが押された処理。新規の編集画面へ移行
         val newID = getLastId()!! + 1
         val editFragment = EditFragment.newInstance(newID,"","",true)
+
+        // EditFragmentに移行
         val fragmentTransaction =fragmentManager!!.beginTransaction()
         fragmentTransaction?.addToBackStack(null)
         fragmentTransaction?.replace(R.id.fragment_container, editFragment)
@@ -157,4 +170,3 @@ class MainFragment : Fragment(),RecyclerViewHolder.ItemClickListener, View.OnCli
     }
 
 }
-
